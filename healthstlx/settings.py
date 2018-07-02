@@ -83,7 +83,7 @@ ROOT_URLCONF = 'healthstlx.urls'
 
 WSGI_APPLICATION = 'healthstlx.wsgi.application'
 
-if 'HACKATHON_KIT_LOCAL_NAME' not in os.environ:
+if 'HEALTHSTLX_LOCAL_NAME' not in os.environ:
     DATABASES = {
         'default': dj_database_url.parse(get_env_variable("DATABASE_URL"))
     }
