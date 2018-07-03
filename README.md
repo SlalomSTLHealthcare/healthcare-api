@@ -40,10 +40,9 @@ Next we need to set the following variables in our bash shell so that Django kno
 **Run the following in your shell:**
 
 ```
-export HACKATHON_KIT_LOCAL_NAME=<your_database>
-export HACKATHON_KIT_LOCAL_USERNAME=<your_username>
-export HACKATHON_KIT_LOCAL_PASSWORD=<your_password>
-export DJANGO_HACKATHON_KIT_SECRET_KEY="random_string_here"
+export HEALTHSLTLX_LOCAL_NAME=<your_database>
+export HEALTHSLTLX_LOCAL_USERNAME=<your_username>
+export HEALTHSLTLX_LOCAL_PASSWORD=<your_password>
 ```
 
 > Note: If you don't want to have to set these variables every time you open a shell, you can set them in your .bashrc (or .zshrc like me), you can write a script to export them for you, or if you use a virtual environment (recommended) follow these [instructions](#additional-notes) to have the variables always exist when in your environment.
@@ -63,38 +62,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-That is all you need to get started, however I have added sections below on the one-button install to [Heroku](https://www.heroku.com/) and an explanation of the frontend stack.
-
-
-## Deploying to Heroku
-
-This project is already set up to be immediately deployed to **Heroku** through one click of the following button.  All you have to do is add a name.
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-If you want to change the settings of this deployment, please visit [app.json](./app.json)
-
-- It comes standard with:
-    - Free server
-    - Free postgres database
-    - Papertrail
-        - Free app that allows you to view server logs easily
-
-Once deployed on Heroku, you will want to download the [heroku toolbelt](https://devcenter.heroku.com/articles/heroku-command-line) to your local system.
-
-Then **run the below command** to connect your local git repo with your Heroku instance, replacing `PROJECTNAME` with the name you set on your Heroku app when you deployed it.
-
-```
-heroku git:remote -a PROJECTNAME
-```
-
-Every time you push code to the Heroku server, **run the following from your project directory:**
-
-```
-git push heroku master
-```
-
-For more information on deploying with git to Heroku, look here: [Heroku: Deploying with Git](https://devcenter.heroku.com/articles/git)
+That is all you need to get started!
 
 
 ## Additional Notes
@@ -109,25 +77,23 @@ edit: `~/.virtualenvs/<virtual_env_name>/bin/postactivate`
 ```
 #!/bin/zsh
 # This hook is sourced after this virtualenv is activated.
-export HACKATHON_KIT_LOCAL_NAME=<your_database>
-export HACKATHON_KIT_LOCAL_USERNAME=<your_username>
-export HACKATHON_KIT_LOCAL_PASSWORD=<your_password>
-export DJANGO_HACKATHON_KIT_SECRET_KEY="random_string_here"
-echo "Hackathon kit local variables have been set."
+export HEALTHSTLX_LOCAL_NAME=<your_database>
+export HEALTHSTLX_LOCAL_USERNAME=<your_username>
+export HEALTHSTLX_LOCAL_PASSWORD=<your_password>
+echo "Healthcare api local variables have been set."
 ```
 
 edit: `~/.virtualenvs/<virtual_env_name>/bin/predeactivate`
 ```
 #!/bin/zsh
 # This hook is sourced after this virtualenv is activated.
-unset HACKATHON_KIT_LOCAL_NAME
-unset HACKATHON_KIT_LOCAL_USERNAME
-unset HACKATHON_KIT_LOCAL_PASSWORD
-unset DJANGO_HACKATHON_KIT_SECRET_KEY
-echo "Hackathon kit local variables removed."
+unset HEALTHSTLX_LOCAL_NAME
+unset HEALTHSTLX_LOCAL_USERNAME
+unset HEALTHSTLX_LOCAL_PASSWORD
+echo "Healthcare api local variables removed."
 ```
 
 
 ## Author Note
 
-Released by [Dan Borstelmann](https://github.com/dborstelmann) on August 29, 2016.
+Released by [Dan Borstelmann](https://github.com/dborstelmann) on July 3, 2018.
