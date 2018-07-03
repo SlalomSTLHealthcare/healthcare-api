@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Speaker(models.Model):
+
     fullName = models.CharField(max_length=63, blank=True)
     title = models.CharField(max_length=63, blank=True)
     company = models.CharField(max_length=63, blank=True)
