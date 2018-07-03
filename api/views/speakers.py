@@ -8,7 +8,7 @@ class Speakers(View):
     def get(request):
         '''Retrieve a list of all speakers.'''
 
-        speaker_list = Speaker.objects.all().values('name')
+        speaker_list = Speaker.objects.all().values('fullName')
         return json_response(speaker_list)
 
     @staticmethod
