@@ -1,3 +1,2 @@
-from .speaker import Speaker
-from .panel import Panel
-from .breakout import Breakout
+from .session import Session
+from .person import Person

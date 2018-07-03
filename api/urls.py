@@ -1,11 +1,9 @@
 from django.conf.urls import url
 
-from .views.speakers import Speakers
-from .views.panels import Panels
-from .views.breakouts import Breakouts
+from .views.people import People
+from .views.sessions import Sessions
 
 urlpatterns = [
-    url(r'^speakers$', Speakers.as_view(), name='speakers'),
-    url(r'^panels$', Panels.as_view(), name='panels'),
-    url(r'^breakouts$', Breakouts.as_view(), name='breakouts')
+    url(r'^people$', People.as_view(), name='people'),
+    url(r'^sessions$', Sessions.as_view(), name='sessions')
 ]
