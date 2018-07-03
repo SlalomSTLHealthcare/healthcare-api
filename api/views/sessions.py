@@ -1,15 +1,15 @@
-from api.models import Panel
+from api.models import Session
 from django.views.generic.base import View
 from utils import json_response
 
 
-class Panels(View):
+class Sessions(View):
     @staticmethod
     def get(request):
         '''Retrieve a list of all panels.'''
 
-        panel_list = Panel.objects.all().values()
-        return json_response(panel_list)
+        session_list = Session.objects.all().values()
+        return json_response(session_list)
 
     @staticmethod
     def post(request):
