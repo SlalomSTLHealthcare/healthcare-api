@@ -2,7 +2,8 @@ from django.conf.urls import url
 
 from .views.people import People
 from .views.sessions import Sessions
-from .views.sessions import Sponsors
+from .views.sponsors import Sponsors
+from .views.schedules import Schedules
 
 urlpatterns = [
     url(r'^people$', People.as_view(), name='people'),
