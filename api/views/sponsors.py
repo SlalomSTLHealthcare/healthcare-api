@@ -1,4 +1,4 @@
-from api.models import sponsor
+from api.models import Sponsor
 from django.views.generic.base import View
 from utils import json_response
 
