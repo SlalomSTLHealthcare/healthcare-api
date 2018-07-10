@@ -1,4 +1,4 @@
-from api.models import schedule
+from api.models import Schedule
 from django.views.generic.base import View
 from utils import json_response
 
