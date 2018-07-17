@@ -36,8 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
-    'django.contrib.staticfiles',
     'django.views.decorators.csrf',
+    'django.db.models.signals',
+    'django.dispatch',
     'api',
     'authentication',
     'corsheaders'
