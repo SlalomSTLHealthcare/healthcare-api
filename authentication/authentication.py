@@ -1,11 +1,14 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, HttpResponseBadRequest
 from django.contrib.auth import authenticate, logout, login
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def stlx_login(request):
-    email = request.POST.get('email', '')
-    password = request.POST.get('password', '')
+    params = json.loads(request.body)
+    email = params.get('email', '')
+    password = params.get('password', '')
 
     user = authenticate(username=email, password=password)
     if user is not None:
@@ -20,10 +23,11 @@ def stlx_logout(request):
     logout(request)
     return HttpResponseRedirect('/')
 
-
+@csrf_exempt
 def stlx_register(request):
-    email = request.POST.get('email', '')
-    password = request.POST.get('password', '')
+    params = json.loads(request.body)
+    email = params.get('email', '')
+    password = params.get('password', '')
     if User.objects.filter(email=email).exists():
         return HttpResponseBadRequest(reason='A user exists for this email address.')
 
@@ -31,7 +35,7 @@ def stlx_register(request):
         return HttpResponseBadRequest(reason='Sorry, this username is taken.')
 
     try:
-        User.objects.create_user(email, email, password)
+        User.objects.create_user(username=email,password=password,email=email)
         user = authenticate(username=email, password=password)
     except Exception as e:
         print(str(e))
