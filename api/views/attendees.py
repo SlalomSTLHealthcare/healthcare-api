@@ -14,3 +14,4 @@ class Attendees(View):
     @staticmethod
     def post(request):
         return json_response({})
+
