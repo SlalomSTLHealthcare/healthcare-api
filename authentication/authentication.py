@@ -69,6 +69,9 @@ def update_attendee(params, user_email):
     user.attendee.diet_allergy = params.get('allergies', '')
     user.attendee.tshirt_size = params.get('size', '')
     user.attendee.donate = params.get('donate', True)
+    user.attendee.breakout_one = params.get('breakout_one', [])
+    user.attendee.breakout_two = params.get('breakout_two', [])
+
 
 
     user.save()
