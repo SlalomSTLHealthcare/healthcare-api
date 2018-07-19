@@ -1,5 +1,6 @@
 from api.models import Schedule
 from django.views.generic.base import View
+from itertools import chain
 from utils import json_response
 
 
@@ -7,7 +8,6 @@ class Schedules(View):
     @staticmethod
     def get(request):
         '''Retrieve a list of all schedules.'''
-
         schedule_list = Schedule.objects.all().values()
         return json_response(schedule_list)
 
