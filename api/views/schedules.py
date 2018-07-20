@@ -7,7 +7,7 @@ class Schedules(View):
     @staticmethod
     def get(request):
         '''Retrieve a list of all schedules.'''
-
+        
         schedule_list = Schedule.objects.all().values()
         return json_response(schedule_list)
 
