@@ -25,9 +25,10 @@ def get_env_variable(env_var, optional=False):
 DEBUG = True
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CSRF_COOKIE_NAME = "XSRF-TOKEN"
+CSRF_COOKIE_SECURE = True
 SECRET_KEY = 'HEALTHSTLX'
 ALLOWED_HOSTS = ["localhost", ".herokuapp.com"]
+
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -84,6 +85,7 @@ STATICFILES_DIRS = [
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = False
 ROOT_URLCONF = 'healthstlx.urls'
 
 WSGI_APPLICATION = 'healthstlx.wsgi.application'
