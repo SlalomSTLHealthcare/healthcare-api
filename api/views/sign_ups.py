@@ -2,12 +2,14 @@ from api.models import EmailSignUp
 from api.models import SponsorQuery
 from django.views.generic.base import View
 from django.http import HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
 from utils import json_response
 import json
 
 
 class EmailSignUpView(View):
     @staticmethod
+    @csrf_exempt
     def post(request):
         params = json.loads(request.body)
         email = params.get('email', '')
@@ -24,6 +26,7 @@ class EmailSignUpView(View):
 
 class SponsorQueryView(View):
     @staticmethod
+    @csrf_exempt
     def post(request):
         params = json.loads(request.body)
         email = params.get('email', '')
