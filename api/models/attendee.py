@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class Attendee(models.Model):
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     company = models.CharField(max_length=63, blank=True)
     position = models.CharField(max_length=63, blank=True)
     twitter = models.CharField(max_length=63, blank=True)
