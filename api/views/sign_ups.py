@@ -29,7 +29,7 @@ class SponsorQueryView(View):
         email = params.get('email', '')
         company = params.get('company', None)
         notes = params.get('notes', None)
-        notes = params.get('name', None)
+        name = params.get('name', None)
 
         try:
             sq = SponsorQuery(email=email, company=company, notes=notes, name=name)
