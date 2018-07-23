@@ -71,7 +71,22 @@ def update_attendee(params, user_email):
     user.attendee.donate = params.get('donate', True)
     user.attendee.breakout_one = params.get('breakout_one', [])
     user.attendee.breakout_two = params.get('breakout_two', [])
-
-
-
     user.save()
+
+
+@csrf_exempt
+def delete(request):
+    params = json.loads(request.body)
+    email = params.get('email', '')
+    user = User.objects.get(email = email)
+
+    if User.objects.filter(email = email).exists():
+        try:
+           user.delete() 
+        except Exception as e:
+            print(str(e))
+            return HttpResponseServerError(reason=str(e))
+    else:
+        return HttpResponseBadRequest(reason='Attendee does not exist')
+
+    return HttpResponse()
