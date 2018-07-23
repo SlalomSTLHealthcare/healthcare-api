@@ -1,15 +1,15 @@
-from api.models import Speaker
+from api.models import Person
 from django.views.generic.base import View
 from utils import json_response
 
 
-class Speakers(View):
+class People(View):
     @staticmethod
     def get(request):
         '''Retrieve a list of all speakers.'''
 
-        speaker_list = Speaker.objects.all().values('name')
-        return json_response(speaker_list)
+        person_list = Person.objects.all().values()
+        return json_response(person_list)
 
     @staticmethod
     def post(request):

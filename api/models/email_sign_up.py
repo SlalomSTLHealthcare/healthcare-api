@@ -1,9 +1,8 @@
 from django.db import models
 
 
-class Speaker(models.Model):
-    name = models.CharField(max_length=63, blank=True)
-    company = models.CharField(max_length=63, blank=True)
+class EmailSignUp(models.Model):
+    email = models.CharField(max_length=127)
 
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)

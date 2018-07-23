@@ -25,6 +25,7 @@ def get_env_variable(env_var, optional=False):
 DEBUG = True
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
 SECRET_KEY = 'HEALTHSTLX'
 ALLOWED_HOSTS = ["localhost", ".herokuapp.com"]
 
@@ -35,12 +36,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
-    'django.contrib.staticfiles',
+    'django.views.decorators.csrf',
+    'django.db.models.signals',
+    'django.dispatch',
     'api',
-    'authentication'
+    'authentication',
+    'corsheaders'
 )
 
 MIDDLEWARE = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
