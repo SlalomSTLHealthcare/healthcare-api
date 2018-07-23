@@ -27,7 +27,3 @@ class Attendee(models.Model):
 def create_user_attendee(sender, instance, created, **kwargs):
     if created:
         Attendee.objects.create(user=instance, diet=[], breakout_one=[],  breakout_two=[])
-
-@receiver(post_save, sender=User)
-def save_user_attendee(sender, instance, **kwargs):
-    instance.attendee.save()
