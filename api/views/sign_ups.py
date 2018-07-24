@@ -11,9 +11,10 @@ class EmailSignUpView(View):
     def post(request):
         params = json.loads(request.body)
         email = params.get('email', '')
+        name = params.get('name', None)
 
         try:
-            esu = EmailSignUp(email=email)
+            esu = EmailSignUp(email=email, name=name)
             esu.save()
         except Exception as e:
             print(str(e))
