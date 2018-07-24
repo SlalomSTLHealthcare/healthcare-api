@@ -1,9 +1,12 @@
 from django.contrib.auth.models import User
 from api.models import Attendee
+from api.models import Session_Attendee
+from api.models import Session
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, HttpResponseBadRequest
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.csrf import csrf_exempt
 import json
+import datetime
 
 
 @csrf_exempt
@@ -69,8 +72,10 @@ def update_attendee(params, user_email):
     user.attendee.diet_allergy = params.get('allergies', '')
     user.attendee.tshirt_size = params.get('size', '')
     user.attendee.donate = params.get('donate', True)
-    user.attendee.breakout_one = params.get('breakout_one', [])
-    user.attendee.breakout_two = params.get('breakout_two', [])
+    breakout_one = Session.objects.get(pk = params.get('breakout_one'))
+    breakout_two = Session.objects.get(pk = params.get('breakout_two'))
+    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_one, date_signedup=datetime.datetime.now())
+    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_two, date_signedup=datetime.datetime.now())
     user.save()
 
 
@@ -82,7 +87,7 @@ def delete(request):
 
     if User.objects.filter(email = email).exists():
         try:
-           user.delete() 
+           user.delete()
         except Exception as e:
             print(str(e))
             return HttpResponseServerError(reason=str(e))
