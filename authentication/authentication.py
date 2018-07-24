@@ -78,9 +78,9 @@ def update_attendee(params, user_email):
 def delete(request):
     params = json.loads(request.body)
     email = params.get('email', '')
-    user = User.objects.get(email = email)
+    user = User.objects.get(email=email)
 
-    if User.objects.filter(email = email).exists():
+    if User.objects.filter(email=email).exists():
         try:
            user.delete() 
         except Exception as e:
@@ -96,10 +96,10 @@ def update_info(request):
     params = json.loads(request.body)
     updated_email = params.get('updatedEmail','')
     user_email = params.get('email', '')
-    user = User.objects.get(email = user_email)
+    user = User.objects.get(email=user_email)
     update_attendee(params, user_email)
 
-    if User.objects.filter(email = updated_email).exists():
+    if User.objects.filter(email=updated_email).exists():
         return HttpResponseBadRequest(reason='Email already in use')
     else:
         user.email = params.get('updatedEmail', '')
@@ -107,7 +107,8 @@ def update_info(request):
         user.firstName = params.get('firstName', '')
         user.lastName = params.get('lastName', '')
         user.save()
-        return HttpResponse()
+
+    return HttpResponse()
 
 
 
