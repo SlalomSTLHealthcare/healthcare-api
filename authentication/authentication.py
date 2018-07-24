@@ -82,7 +82,7 @@ def delete(request):
 
     if User.objects.filter(email=email).exists():
         try:
-           user.delete() 
+           user.delete()
         except Exception as e:
             print(str(e))
             return HttpResponseServerError(reason=str(e))
@@ -97,11 +97,12 @@ def update_info(request):
     updated_email = params.get('updatedEmail','')
     user_email = params.get('email', '')
     user = User.objects.get(email=user_email)
-    update_attendee(params, user_email)
+
 
     if User.objects.filter(email=updated_email).exists():
         return HttpResponseBadRequest(reason='Email already in use')
     else:
+        update_attendee(params, user_email)
         user.email = params.get('updatedEmail', '')
         user.username = params.get('updatedEmail', '')
         user.firstName = params.get('firstName', '')
@@ -109,9 +110,3 @@ def update_info(request):
         user.save()
 
     return HttpResponse()
-
-
-
-
-
-    
