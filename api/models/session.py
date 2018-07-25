@@ -10,7 +10,7 @@ class Session(models.Model):
     time = models.DateTimeField(blank=True, null=True)
     room_num = models.PositiveSmallIntegerField(blank=True, null=True)
     schedule = models.ForeignKey(Schedule, on_delete=models.PROTECT, related_name='sessions', null=True)
-    session_num = models.PositiveSmallIntegerField(blank=True, null=True)
+    max_capacity = models.PositiveSmallIntegerField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)

@@ -76,6 +76,17 @@ def update_attendee(params, user_email):
     breakout_two = Session.objects.get(pk = params.get('breakout_two'))
     Session_Attendee.objects.create(attendee=user.attendee, session=breakout_one, date_signedup=datetime.datetime.now())
     Session_Attendee.objects.create(attendee=user.attendee, session=breakout_two, date_signedup=datetime.datetime.now())
+    breakout_one_waitlist_id = params.get('breakout_oneWait')
+    breakout_two_waitlist_id = params.get('breakout_twoWait')
+
+    if breakout_one_waitlist_id  != '':
+        breakout_oneWait = Session.objects.get(pk = breakout_one_waitlist_id)
+        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_oneWait, date_signedup=datetime.datetime.now())
+
+    if breakout_two_waitlist_id != '':
+        breakout_twoWait = Session.objects.get(pk = breakout_two_waitlist_id)
+        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_twoWait, date_signedup=datetime.datetime.now())
+
     user.save()
 
 
