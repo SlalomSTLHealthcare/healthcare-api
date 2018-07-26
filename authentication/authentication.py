@@ -94,9 +94,9 @@ def update_attendee(params, user_email):
 def delete(request):
     params = json.loads(request.body)
     email = params.get('email', '')
-    user = User.objects.get(email = email)
+    user = User.objects.get(email=email)
 
-    if User.objects.filter(email = email).exists():
+    if User.objects.filter(email=email).exists():
         try:
            user.delete()
         except Exception as e:
@@ -104,5 +104,30 @@ def delete(request):
             return HttpResponseServerError(reason=str(e))
     else:
         return HttpResponseBadRequest(reason='Attendee does not exist')
+
+    return HttpResponse()
+
+@csrf_exempt
+def update_info(request):
+    params = json.loads(request.body)
+    updated_email = params.get('updatedEmail','')
+    user_email = params.get('email', '')
+    user = User.objects.get(email=user_email)
+
+
+    if User.objects.filter(email=updated_email).exists():
+        return HttpResponseBadRequest(reason='Email already in use')
+    else:
+        try:
+           Session_Attendee.objects.filter(pk=user.attendee.id).delete()
+        except Exception as e:
+            print(str(e))
+            return HttpResponseServerError(reason=str(e))
+        update_attendee(params, user_email)
+        user.email = params.get('updatedEmail', '')
+        user.username = params.get('updatedEmail', '')
+        user.firstName = params.get('firstName', '')
+        user.lastName = params.get('lastName', '')
+        user.save()
 
     return HttpResponse()
