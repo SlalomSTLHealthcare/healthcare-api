@@ -27,6 +27,8 @@ class Session_Attendee(models.Model):
     attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     date_signedup =  models.DateTimeField(blank=True, null=True)
+    session_max_capacity = models.PositiveSmallIntegerField(blank=True, null=True)
+    session_tag= models.PositiveSmallIntegerField(blank=True, null=True)
 
 @receiver(post_save, sender=User)
 def create_user_attendee(sender, instance, created, **kwargs):
