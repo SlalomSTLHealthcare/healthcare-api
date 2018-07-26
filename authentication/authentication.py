@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedir
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.csrf import csrf_exempt
 import json
+from utils import json_response
+from itertools import chain
 
 
 @csrf_exempt
@@ -24,6 +26,19 @@ def stlx_login(request):
 def stlx_logout(request):
     logout(request)
     return HttpResponseRedirect('/')
+
+@csrf_exempt
+def stlx_profile(request):
+    params = json.loads(request.body)
+    email = params.get('email', '')
+    user_list =  User.objects.filter(email=email).all().values()
+    user_id = User.objects.get(email = email).id
+    attendee_list = Attendee.objects.filter(user_id=user_id).all().values()
+    result_list = list(chain(user_list, attendee_list))
+    try:
+        return json_response(result_list)
+    except User.DoesNotExist:
+        return None
 
 @csrf_exempt
 def stlx_register(request):
