@@ -1,11 +1,15 @@
 from django.contrib.auth.models import User
 from api.models import Attendee
+from api.models import Session_Attendee
+from api.models import Session
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, HttpResponseBadRequest
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.csrf import csrf_exempt
 import json
+import datetime
 from utils import json_response
-from itertools import chain
+from django.forms.models import model_to_dict
+
 
 
 @csrf_exempt
@@ -31,12 +35,17 @@ def stlx_logout(request):
 def stlx_profile(request):
     params = json.loads(request.body)
     email = params.get('email', '')
-    user_list =  User.objects.filter(email=email).all().values()
-    user_id = User.objects.get(email = email).id
-    attendee_list = Attendee.objects.filter(user_id=user_id).all().values()
-    result_list = list(chain(user_list, attendee_list))
+    user = User.objects.get(email=email)
+    session_attendee_list = list(Session_Attendee.objects.filter(attendee_id=user.attendee.id).values())
+    user_fields = {'first_name', 'last_name', 'email'}
+    attendee_fields = {'id','company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
+    result={
+        "user": model_to_dict(instance=user,fields=user_fields),
+        "attendee": model_to_dict(instance=user.attendee,fields=attendee_fields),
+        "sessions": session_attendee_list
+    }
     try:
-        return json_response(result_list)
+        return json_response(result)
     except User.DoesNotExist:
         return None
 
@@ -84,8 +93,25 @@ def update_attendee(params, user_email):
     user.attendee.diet_allergy = params.get('allergies', '')
     user.attendee.tshirt_size = params.get('size', '')
     user.attendee.donate = params.get('donate', True)
-    user.attendee.breakout_one = params.get('breakout_one', [])
-    user.attendee.breakout_two = params.get('breakout_two', [])
+    breakout_one = Session.objects.get(pk = params.get('breakout_one'))
+    max_capacity_one = Session.objects.get(pk = params.get('breakout_one')).max_capacity
+    breakout_two = Session.objects.get(pk = params.get('breakout_two'))
+    max_capacity_two = Session.objects.get(pk = params.get('breakout_two')).max_capacity
+    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_one, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_one, session_tag=1)
+    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_two, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_two, session_tag=2)
+    breakout_one_waitlist_id = params.get('breakout_oneWait')
+    breakout_two_waitlist_id = params.get('breakout_twoWait')
+
+    if breakout_one_waitlist_id  != '':
+        breakout_oneWait = Session.objects.get(pk = breakout_one_waitlist_id)
+        max_capacity_oneWait = Session.objects.get(pk = breakout_one_waitlist_id).max_capacity
+        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_oneWait, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_oneWait, session_tag=1 )
+
+    if breakout_two_waitlist_id != '':
+        breakout_twoWait = Session.objects.get(pk = breakout_two_waitlist_id)
+        max_capacity_twoWait = Session.objects.get(pk = breakout_two_waitlist_id).max_capacity
+        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_twoWait, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_twoWait, session_tag=2)
+
     user.save()
 
 
@@ -114,14 +140,19 @@ def update_info(request):
     user = User.objects.get(email=user_email)
 
 
-    if User.objects.filter(email=updated_email).exists():
+    if User.objects.filter(email=updated_email).exists() and user_email != updated_email:
         return HttpResponseBadRequest(reason='Email already in use')
     else:
+        try:
+            Session_Attendee.objects.filter(attendee_id=user.attendee.id).delete()
+        except Exception as e:
+            print(str(e))
+            return HttpResponseServerError(reason=str(e))
         update_attendee(params, user_email)
         user.email = params.get('updatedEmail', '')
         user.username = params.get('updatedEmail', '')
-        user.firstName = params.get('firstName', '')
-        user.lastName = params.get('lastName', '')
+        user.first_name = params.get('firstName', '')
+        user.last_name = params.get('lastName', '')
         user.save()
 
     return HttpResponse()
