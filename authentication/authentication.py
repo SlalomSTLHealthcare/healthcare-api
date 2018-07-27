@@ -38,7 +38,7 @@ def stlx_profile(request):
     user = User.objects.get(email=email)
     session_attendee_list = list(Session_Attendee.objects.filter(attendee_id=user.attendee.id).values())
     user_fields = {'first_name', 'last_name', 'email'}
-    attendee_fields = {'company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
+    attendee_fields = {'id','company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
     result={
         "user": model_to_dict(instance=user,fields=user_fields),
         "attendee": model_to_dict(instance=user.attendee,fields=attendee_fields),
@@ -140,20 +140,19 @@ def update_info(request):
     user = User.objects.get(email=user_email)
 
 
-    if User.objects.filter(email=updated_email).exists():
+    if User.objects.filter(email=updated_email).exists() and user_email != updated_email:
         return HttpResponseBadRequest(reason='Email already in use')
     else:
-        import pdb; pdb.set_trace()
-        # try:
-        #     #if Session_Attendee.objects.filter(attendee_id=user.attendee.id).exists():
-        # except Exception as e:
-        #     print(str(e))
-        #     return HttpResponseServerError(reason=str(e))
+        try:
+            Session_Attendee.objects.filter(attendee_id=user.attendee.id).delete()
+        except Exception as e:
+            print(str(e))
+            return HttpResponseServerError(reason=str(e))
         update_attendee(params, user_email)
         user.email = params.get('updatedEmail', '')
         user.username = params.get('updatedEmail', '')
-        user.firstName = params.get('firstName', '')
-        user.lastName = params.get('lastName', '')
+        user.first_name = params.get('firstName', '')
+        user.last_name = params.get('lastName', '')
         user.save()
 
     return HttpResponse()
