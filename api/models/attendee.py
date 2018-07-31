@@ -12,7 +12,7 @@ class Attendee(models.Model):
     position = models.CharField(max_length=63, blank=True)
     twitter = models.CharField(max_length=63, blank=True)
     lunch = models.BooleanField(blank=True, default=True)
-    diet = ArrayField(models.CharField(max_length=10, blank=True) ,size=4)
+    diet = ArrayField(models.CharField(max_length=63, blank=True) ,size=4)
     diet_allergy = models.CharField(max_length=255, blank=True)
     tshirt_size = models.CharField(max_length=63, blank=True)
     comment = models.CharField(max_length=255, blank=True)
