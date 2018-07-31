@@ -2,13 +2,17 @@ from django.contrib.auth.models import User
 from api.models import Attendee
 from api.models import Session_Attendee
 from api.models import Session
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, HttpResponseBadRequest, HttpRequest
 from django.contrib.auth import authenticate, logout, login
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
 from utils import json_response
 from django.forms.models import model_to_dict
+import jwt
+from rest_framework_jwt.views import verify_jwt_token
+
+
 
 
 
@@ -34,20 +38,24 @@ def stlx_logout(request):
 @csrf_exempt
 def stlx_profile(request):
     params = json.loads(request.body)
-    email = params.get('email', '')
-    user = User.objects.get(email=email)
-    session_attendee_list = list(Session_Attendee.objects.filter(attendee_id=user.attendee.id).values())
-    user_fields = {'first_name', 'last_name', 'email'}
-    attendee_fields = {'id','company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
-    result={
-        "user": model_to_dict(instance=user,fields=user_fields),
-        "attendee": model_to_dict(instance=user.attendee,fields=attendee_fields),
-        "sessions": session_attendee_list
-    }
-    try:
+    token = params.get('token', '')
+    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    username = payload['username']
+
+    user = User.objects.get(username=username)
+    if user is not None:
+        session_attendee_list = list(Session_Attendee.objects.filter(attendee_id=user.attendee.id).values())
+        user_fields = {'first_name', 'last_name', 'email'}
+        attendee_fields = {'id','company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
+        result={
+            "user": model_to_dict(instance=user,fields=user_fields),
+            "attendee": model_to_dict(instance=user.attendee,fields=attendee_fields),
+            "sessions": session_attendee_list
+        }
         return json_response(result)
-    except User.DoesNotExist:
-        return None
+    else:
+        return HttpResponseBadRequest(reason='Invalid Username and Password')
+
 
 @csrf_exempt
 def stlx_register(request):
@@ -82,17 +90,17 @@ def stlx_register(request):
 def update_attendee(params, user_email):
     user_id = User.objects.get(email = user_email).id
     user = User.objects.get(pk = user_id)
-    user.attendee.comment = params.get('comment', '')
-    user.attendee.firstName = params.get('firstName', '')
-    user.attendee.lastName = params.get('lastName', '')
-    user.attendee.company = params.get ('company', '')
-    user.attendee.position = params.get('position', '')
-    user.attendee.twitter = params.get('twitter', '')
-    user.attendee.lunch = params.get('lunch', True)
-    user.attendee.diet = params.get('diet', [])
-    user.attendee.diet_allergy = params.get('allergies', '')
-    user.attendee.tshirt_size = params.get('size', '')
-    user.attendee.donate = params.get('donate', True)
+    user.attendee.comment = params.get('comment','')
+    user.attendee.firstName = params.get('firstName','')
+    user.attendee.lastName = params.get('lastName','')
+    user.attendee.company = params.get('company','')
+    user.attendee.position = params.get('position','')
+    user.attendee.twitter = params.get('twitter','')
+    user.attendee.lunch = params.get('lunch',True)
+    user.attendee.diet = params.get('diet',[])
+    user.attendee.diet_allergy = params.get('allergies','')
+    user.attendee.tshirt_size = params.get('size','')
+    user.attendee.donate = params.get('donate',True)
     breakout_one = Session.objects.get(pk = params.get('breakout_one'))
     max_capacity_one = Session.objects.get(pk = params.get('breakout_one')).max_capacity
     breakout_two = Session.objects.get(pk = params.get('breakout_two'))
@@ -117,30 +125,52 @@ def update_attendee(params, user_email):
 
 @csrf_exempt
 def delete(request):
-    params = json.loads(request.body)
-    email = params.get('email', '')
-    user = User.objects.get(email=email)
 
-    if User.objects.filter(email=email).exists():
+    params = json.loads(request.body)
+    token = params.get('token', '')
+    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    username = payload['username']
+    password = payload['password']
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
         try:
            user.delete()
         except Exception as e:
             print(str(e))
             return HttpResponseServerError(reason=str(e))
     else:
-        return HttpResponseBadRequest(reason='Attendee does not exist')
+        return HttpResponseBadRequest(reason='Token not verified')
 
     return HttpResponse()
 
 @csrf_exempt
+def decode_token(request):
+    params = json.loads(request.body)
+    token = params.get('token', '')
+
+    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    username = payload['username']
+    response={
+        "username": username
+    }
+    return json_response(response)
+
+
+@csrf_exempt
 def update_info(request):
     params = json.loads(request.body)
+    token = params.get('token', '')
+    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    username = payload['username']
+
+    user = User.objects.get(username=username)
+    if user is None:
+        return HttpResponseBadRequest(reason='Token not verified')
     updated_email = params.get('updatedEmail','')
-    user_email = params.get('email', '')
-    user = User.objects.get(email=user_email)
 
 
-    if User.objects.filter(email=updated_email).exists() and user_email != updated_email:
+    if User.objects.filter(email=updated_email).exists() and user.email != updated_email:
         return HttpResponseBadRequest(reason='Email already in use')
     else:
         try:
@@ -148,11 +178,16 @@ def update_info(request):
         except Exception as e:
             print(str(e))
             return HttpResponseServerError(reason=str(e))
-        update_attendee(params, user_email)
+        update_attendee(params, user.email)
+        user = User.objects.get(username=username)
+
+
         user.email = params.get('updatedEmail', '')
         user.username = params.get('updatedEmail', '')
         user.first_name = params.get('firstName', '')
         user.last_name = params.get('lastName', '')
+
         user.save()
 
-    return HttpResponse()
+    result={'email': username}
+    return json_response(result)

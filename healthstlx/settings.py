@@ -8,6 +8,10 @@ Production settings file to select proper environment variables.
 import os
 from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
+import datetime
+from rest_framework.settings import APISettings
+from django.conf import settings
+
 
 
 def get_env_variable(env_var, optional=False):
@@ -29,6 +33,21 @@ CSRF_COOKIE_SECURE = True
 SECRET_KEY = 'HEALTHSTLX'
 ALLOWED_HOSTS = ["localhost", ".herokuapp.com"]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
+    )
+}
+JWT_AUTH = {
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_SECRET_KEY': "1C3E9AC35F5D286D588B29A65B8A6"
+}
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -40,6 +59,7 @@ INSTALLED_APPS = (
     'django.views.decorators.csrf',
     'django.db.models.signals',
     'django.dispatch',
+    'rest_framework',
     'api',
     'authentication',
     'corsheaders'
@@ -81,6 +101,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
