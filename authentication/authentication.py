@@ -10,7 +10,17 @@ import datetime
 from utils import json_response
 from django.forms.models import model_to_dict
 import jwt
-from rest_framework_jwt.views import verify_jwt_token
+from rest_framework_jwt.settings import api_settings
+jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+
+
+def verify_jwt_token(jwt_token):
+    try:
+        payload = jwt_decode_handler(jwt_token)
+    except:
+        return False;
+    else:
+        return payload
 
 
 
@@ -39,7 +49,10 @@ def stlx_logout(request):
 def stlx_profile(request):
     params = json.loads(request.body)
     token = params.get('token', '')
-    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+
+    payload = verify_jwt_token(token)
+    if payload == False:
+        return HttpResponseBadRequest(reason='Invalid Token')
     username = payload['username']
 
     user = User.objects.get(username=username)
@@ -128,11 +141,12 @@ def delete(request):
 
     params = json.loads(request.body)
     token = params.get('token', '')
-    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    payload = verify_jwt_token(token)
+    if payload == False:
+        return HttpResponseBadRequest(reason='Invalid Token')
     username = payload['username']
-    password = payload['password']
 
-    user = authenticate(username=username, password=password)
+    user = User.objects.get(username=username)
     if user is not None:
         try:
            user.delete()
@@ -140,28 +154,18 @@ def delete(request):
             print(str(e))
             return HttpResponseServerError(reason=str(e))
     else:
-        return HttpResponseBadRequest(reason='Token not verified')
+        return HttpResponseBadRequest(reason='User does not exist')
 
     return HttpResponse()
-
-@csrf_exempt
-def decode_token(request):
-    params = json.loads(request.body)
-    token = params.get('token', '')
-
-    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
-    username = payload['username']
-    response={
-        "username": username
-    }
-    return json_response(response)
 
 
 @csrf_exempt
 def update_info(request):
     params = json.loads(request.body)
     token = params.get('token', '')
-    payload = jwt.decode(token, '1C3E9AC35F5D286D588B29A65B8A6', algorithms='HS256')
+    payload = verify_jwt_token(token)
+    if payload == False:
+        return HttpResponseBadRequest(reason='Invalid Token')
     username = payload['username']
 
     user = User.objects.get(username=username)
