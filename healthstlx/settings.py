@@ -27,7 +27,7 @@ def get_env_variable(env_var, optional=False):
 
 
 DEBUG = True
-
+SECRET_KEY = "1C3E9AC35F5D286D588B29A65B8A6"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSRF_COOKIE_SECURE = True
 SECRET_KEY = 'HEALTHSTLX'
@@ -46,7 +46,7 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-    'JWT_SECRET_KEY': "1C3E9AC35F5D286D588B29A65B8A6"
+    'JWT_SECRET_KEY': SECRET_KEY
 }
 
 INSTALLED_APPS = (

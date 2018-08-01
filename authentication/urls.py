@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .authentication import stlx_logout, stlx_register, delete, update_info, stlx_profile, decode_token
+from .authentication import stlx_logout, stlx_register, delete, update_info, stlx_profile
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 urlpatterns = [
