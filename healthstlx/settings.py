@@ -30,7 +30,11 @@ DEBUG = True
 SECRET_KEY = "1C3E9AC35F5D286D588B29A65B8A6"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSRF_COOKIE_SECURE = True
-SECRET_KEY = 'HEALTHSTLX'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_PORT = 587
+EMAIL_HOST_PASSWORD = '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'
 ALLOWED_HOSTS = ["localhost", ".herokuapp.com"]
 
 REST_FRAMEWORK = {
@@ -80,7 +84,7 @@ MIDDLEWARE = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['./templates/email'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -15,4 +15,6 @@ urlpatterns = [
     url(r'^attendees$', Attendees.as_view(), name='attendees'),
     url(r'^session_attendees$', Sessions_Attendees.as_view(), name='session_attendees')
 
+
+
 ]
