@@ -12,6 +12,35 @@ from django.forms.models import model_to_dict
 import jwt
 from rest_framework_jwt.settings import api_settings
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+import sendgrid
+from sendgrid.helpers.mail import *
+from django.shortcuts import render
+
+SECRET_KEY = "1C3E9AC35F5D286D588B29A65B8A6"
+
+def create_token(user):
+    return jwt.encode({'username': user.username}, SECRET_KEY, algorithm='HS256')
+
+@csrf_exempt
+def activate_user(request, token):
+    payload = verify_jwt_token(token)
+    if payload == False:
+        return HttpResponseBadRequest(reason='Invalid Token')
+    username = payload['username']
+    user = User.objects.get(username=username)
+
+    try:
+        user.is_active = True
+        user.save()
+
+    except Exception as e:
+        print(str(e))
+        return HttpResponseServerError(reason=str(e))
+
+    return render(request, 'successful_activation.html')
 
 
 def verify_jwt_token(jwt_token):
@@ -21,10 +50,6 @@ def verify_jwt_token(jwt_token):
         return False;
     else:
         return payload
-
-
-
-
 
 @csrf_exempt
 def stlx_login(request):
@@ -87,15 +112,33 @@ def stlx_register(request):
     try:
         User.objects.create_user(username=email,password=password,email=email, first_name=first_name, last_name=last_name)
         user = authenticate(username=email, password=password)
+        user.is_active = False
+        user.save()
+
     except Exception as e:
         print(str(e))
         return HttpResponseServerError(reason=str(e))
 
     try:
-        user.is_active = False
         update_attendee(params, email)
         login(request, user)
-        return HttpResponse()
+        user = User.objects.get(email=email)
+        token = create_token(user)
+        domain = get_current_site(request).domain
+        sg = sendgrid.SendGridAPIClient(apikey='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')
+        from_email = Email("healthstlxapp@gmail.com")
+        to_email = Email(email)
+        subject = "Sending with SendGrid is Fun"
+        context = {
+            "user": user,
+            "token": token.decode("utf-8"),
+            "domain": domain
+        }
+        # content = Content("text/plain", "and easy to do anywhere, even with Python")
+        content = Content("text/html", render_to_string('activate_email.html', context))
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        return HttpResponse('Please confirm your email address to complete the registration')
     except Exception as e:
         print(str(e))
         return HttpResponseServerError(reason=str(e))
@@ -114,26 +157,31 @@ def update_attendee(params, user_email):
     user.attendee.diet_allergy = params.get('allergies','')
     user.attendee.tshirt_size = params.get('size','')
     user.attendee.donate = params.get('donate',True)
-    breakout_one = Session.objects.get(pk = params.get('breakout_one'))
-    max_capacity_one = Session.objects.get(pk = params.get('breakout_one')).max_capacity
-    breakout_two = Session.objects.get(pk = params.get('breakout_two'))
-    max_capacity_two = Session.objects.get(pk = params.get('breakout_two')).max_capacity
-    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_one, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_one, session_tag=1)
-    Session_Attendee.objects.create(attendee=user.attendee, session=breakout_two, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_two, session_tag=2)
+    breakout_one_id = params.get('breakout_one')
+    breakout_two_id = params.get('breakout_two')
     breakout_one_waitlist_id = params.get('breakout_oneWait')
     breakout_two_waitlist_id = params.get('breakout_twoWait')
 
+    if breakout_one_id != '':
+        create_breakout(breakout_one_id, user, 1)
+
+    if breakout_two_id != '':
+        create_breakout(breakout_two_id, user, 2)
+
+
     if breakout_one_waitlist_id  != '':
-        breakout_oneWait = Session.objects.get(pk = breakout_one_waitlist_id)
-        max_capacity_oneWait = Session.objects.get(pk = breakout_one_waitlist_id).max_capacity
-        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_oneWait, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_oneWait, session_tag=1 )
+        create_breakout(breakout_one_waitlist_id, user, 1)
 
     if breakout_two_waitlist_id != '':
-        breakout_twoWait = Session.objects.get(pk = breakout_two_waitlist_id)
-        max_capacity_twoWait = Session.objects.get(pk = breakout_two_waitlist_id).max_capacity
-        Session_Attendee.objects.create(attendee=user.attendee, session=breakout_twoWait, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity_twoWait, session_tag=2)
+        create_breakout(breakout_two_waitlist_id, user, 2)
 
     user.save()
+
+def create_breakout(breakout_id, user, tag):
+    breakout = Session.objects.get(pk = breakout_id)
+    max_capacity = breakout.max_capacity
+    Session_Attendee.objects.create(attendee=user.attendee, session=breakout, date_signedup=datetime.datetime.now(), session_max_capacity=max_capacity, session_tag=tag )
+
 
 
 @csrf_exempt

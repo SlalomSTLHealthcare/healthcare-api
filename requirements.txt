@@ -11,3 +11,4 @@ whitenoise==3.3.1
 dj-database-url==0.5.0
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
+sendgrid==5.4.1
