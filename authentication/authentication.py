@@ -116,7 +116,6 @@ def stlx_register(request):
     try:
         User.objects.create_user(username=email,password=password,email=email, first_name=first_name, last_name=last_name)
         user = authenticate(username=email, password=password)
-        user.is_active = False
         user.save()
 
     except Exception as e:
@@ -125,14 +124,16 @@ def stlx_register(request):
 
     try:
         update_attendee(params, email)
-        login(request, user)
         user = User.objects.get(email=email)
+        user.is_active = False
+        user.save()
+
         token = create_token(user)
         domain = get_current_site(request).domain
         sg = sendgrid.SendGridAPIClient(apikey=get_env_variable('SENDGRID_API_KEY'))
         from_email = Email("healthstlxapp@gmail.com")
         to_email = Email(email)
-        subject = "Sending with SendGrid is Fun"
+        subject = "HealthSTLX Email Confirmation"
         context = {
             "user": user,
             "token": token.decode("utf-8"),
@@ -151,8 +152,6 @@ def update_attendee(params, user_email):
     user_id = User.objects.get(email = user_email).id
     user = User.objects.get(pk = user_id)
     user.attendee.comment = params.get('comment','')
-    user.attendee.firstName = params.get('firstName','')
-    user.attendee.lastName = params.get('lastName','')
     user.attendee.company = params.get('company','')
     user.attendee.position = params.get('position','')
     user.attendee.twitter = params.get('twitter','')
@@ -161,6 +160,7 @@ def update_attendee(params, user_email):
     user.attendee.diet_allergy = params.get('allergies','')
     user.attendee.tshirt_size = params.get('size','')
     user.attendee.donate = params.get('donate',True)
+    user.save()
     breakout_one_id = params.get('breakout_one')
     breakout_two_id = params.get('breakout_two')
     breakout_one_waitlist_id = params.get('breakout_oneWait')
@@ -179,7 +179,6 @@ def update_attendee(params, user_email):
     if breakout_two_waitlist_id != '':
         create_breakout(breakout_two_waitlist_id, user, 2)
 
-    user.save()
 
 def create_breakout(breakout_id, user, tag):
     breakout = Session.objects.get(pk = breakout_id)
