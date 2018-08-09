@@ -22,8 +22,6 @@ import os
 from healthstlx.settings import get_env_variable
 
 
-# SENDGRID_API_KEY = get_env_variable("SENDGRID_API_KEY")
-
 
 SECRET_KEY = "1C3E9AC35F5D286D588B29A65B8A6"
 
