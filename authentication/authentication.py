@@ -18,6 +18,10 @@ from django.core.mail import send_mail
 import sendgrid
 from sendgrid.helpers.mail import *
 from django.shortcuts import render
+import os
+from healthstlx.settings import get_env_variable
+
+
 
 SECRET_KEY = "1C3E9AC35F5D286D588B29A65B8A6"
 
@@ -125,7 +129,7 @@ def stlx_register(request):
         user = User.objects.get(email=email)
         token = create_token(user)
         domain = get_current_site(request).domain
-        sg = sendgrid.SendGridAPIClient(apikey='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')
+        sg = sendgrid.SendGridAPIClient(apikey=get_env_variable('SENDGRID_API_KEY'))
         from_email = Email("healthstlxapp@gmail.com")
         to_email = Email(email)
         subject = "Sending with SendGrid is Fun"
