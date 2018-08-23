@@ -23,7 +23,7 @@ def create_token(user):
 @csrf_exempt
 def activate_user(request, token):
     payload = verify_jwt_token(token)
-    if payload == False:
+    if payload is False:
         return HttpResponseBadRequest(reason='Invalid Token')
     username = payload['username']
     user = User.objects.get(username=username)
@@ -119,7 +119,7 @@ def stlx_register(request):
     try:
         update_attendee(params, email)
         user = User.objects.get(email=email)
-        user.is_active = False
+        user.is_active = True
         user.save()
 
         return HttpResponse('Successfully registered!')
