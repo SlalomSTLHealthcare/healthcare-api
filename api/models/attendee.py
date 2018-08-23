@@ -7,7 +7,7 @@ from api.models import Session
 
 class Attendee(models.Model):
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     company = models.CharField(max_length=63, blank=True)
     position = models.CharField(max_length=63, blank=True)
     twitter = models.CharField(max_length=63, blank=True)
