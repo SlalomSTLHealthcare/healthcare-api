@@ -82,7 +82,7 @@ def stlx_profile(request):
     if user is not None:
         session_attendee_list = list(Session_Attendee.objects.filter(attendee_id=user.attendee.id).values())
         user_fields = {'first_name', 'last_name', 'email'}
-        attendee_fields = {'id', 'company', 'position', 'twitter', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
+        attendee_fields = {'id', 'company', 'position', 'twitter', 'industry', 'lunch', 'diet', 'diet_allergy', 'tshirt_size', 'comment', 'donate'}
         result = {
             "user": model_to_dict(instance=user, fields=user_fields),
             "attendee": model_to_dict(instance=user.attendee, fields=attendee_fields),
@@ -139,6 +139,7 @@ def update_attendee(params, user_email):
     user.attendee.diet = params.get('diet', [])
     user.attendee.diet_allergy = params.get('allergies', '')
     user.attendee.tshirt_size = params.get('size', '')
+    user.attendee.industry = params.get('industry', '')
     user.attendee.donate = params.get('donate', True)
     user.save()
     breakout_one_id = params.get('breakout_one')

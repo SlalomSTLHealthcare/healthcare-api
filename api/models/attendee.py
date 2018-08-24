@@ -15,6 +15,7 @@ class Attendee(models.Model):
     diet = ArrayField(models.CharField(max_length=63, blank=True) ,size=4)
     diet_allergy = models.CharField(max_length=255, blank=True)
     tshirt_size = models.CharField(max_length=63, blank=True)
+    industry = models.CharField(max_length=63, blank=True)
     comment = models.CharField(max_length=255, blank=True)
     session = models.ManyToManyField(Session, through='Session_Attendee')
     donate = models.BooleanField(blank=True, default=True)
