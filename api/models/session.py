@@ -3,7 +3,7 @@ from .schedule import Schedule
 
 class Session(models.Model):
 
-    title = models.CharField(max_length=63, blank=True)
+    title = models.CharField(max_length=255, blank=True)
     session_type = models.CharField(max_length=63, blank=True)
     image_loc = models.CharField(max_length=255, blank=True)
     description = models.CharField(max_length=1023, blank=True)
