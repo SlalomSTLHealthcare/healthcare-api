@@ -141,6 +141,7 @@ def update_attendee(params, user_email):
     user.attendee.tshirt_size = params.get('size', '')
     user.attendee.industry = params.get('industry', '')
     user.attendee.donate = params.get('donate', True)
+    user.attendee.save()
     user.save()
     breakout_one_id = params.get('breakout_one')
     # breakout_two_id = params.get('breakout_two')
