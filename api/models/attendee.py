@@ -38,4 +38,5 @@ def create_user_attendee(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_user_attendee(sender, instance, **kwargs):
-    instance.attendee.save()
+    if instance.attendee
+        instance.attendee.save()
