@@ -9,7 +9,7 @@ class Person(models.Model):
     bio = models.CharField(max_length=1023, blank=True)
     company = models.CharField(max_length=63, blank=True)
     image_loc = models.CharField(max_length=255, blank=True)
-    session = models.ManyToManyField(Session)
+    session = models.ManyToManyField(Session, blank=True)
     twitter = models.CharField(max_length=63, blank=True)
     linkedin = models.CharField(max_length=63, blank=True)
 
