@@ -143,21 +143,21 @@ def update_attendee(params, user_email):
     user.attendee.donate = params.get('donate', True)
     user.save()
     breakout_one_id = params.get('breakout_one')
-    breakout_two_id = params.get('breakout_two')
+    # breakout_two_id = params.get('breakout_two')
     breakout_one_waitlist_id = params.get('breakout_oneWait')
-    breakout_two_waitlist_id = params.get('breakout_twoWait')
+    # breakout_two_waitlist_id = params.get('breakout_twoWait')
 
     if breakout_one_id != '':
         create_breakout(breakout_one_id, user, 1)
 
-    if breakout_two_id != '':
-        create_breakout(breakout_two_id, user, 2)
+    # if breakout_two_id != '':
+    #     create_breakout(breakout_two_id, user, 2)
 
     if breakout_one_waitlist_id != '':
         create_breakout(breakout_one_waitlist_id, user, 1)
 
-    if breakout_two_waitlist_id != '':
-        create_breakout(breakout_two_waitlist_id, user, 2)
+    # if breakout_two_waitlist_id != '':
+    #     create_breakout(breakout_two_waitlist_id, user, 2)
 
 
 def create_breakout(breakout_id, user, tag):
