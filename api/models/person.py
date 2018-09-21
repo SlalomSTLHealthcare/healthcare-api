@@ -12,6 +12,7 @@ class Person(models.Model):
     session = models.ManyToManyField(Session, blank=True)
     twitter = models.CharField(max_length=63, blank=True)
     linkedin = models.CharField(max_length=63, blank=True)
+    hidden = models.BooleanField(blank=False, default=True)
 
     created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
